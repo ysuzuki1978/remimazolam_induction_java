@@ -139,7 +139,8 @@
 
 /* Enhanced slider styles for modal */
 .modal .slider-container input[type="range"] {
-    background: #e9ecef;
+    background: #ccc;
+    border: 1px solid #999;
 }
 
 .modal .slider-container input[type="range"]::-webkit-slider-thumb {
