@@ -1,0 +1,448 @@
+/* Reset and base styles */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    line-height: 1.6;
+    color: #333;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 100vh;
+}
+
+/* Screen management */
+.screen {
+    display: none;
+    min-height: 100vh;
+}
+
+.screen.active {
+    display: flex !important;
+    flex-direction: column;
+}
+
+/* Ensure disclaimer screen is visible by default */
+#disclaimer-screen {
+    display: flex;
+    flex-direction: column;
+}
+
+#main-screen {
+    display: none;
+}
+
+/* Disclaimer screen */
+.disclaimer-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    padding: 2rem;
+    text-align: center;
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.disclaimer-icon {
+    font-size: 3.5rem;
+    margin-bottom: 1rem;
+}
+
+.disclaimer-title {
+    font-size: 2rem;
+    font-weight: bold;
+    color: white;
+    margin-bottom: 2rem;
+}
+
+.disclaimer-content {
+    background: rgba(255, 255, 255, 0.95);
+    padding: 2rem;
+    border-radius: 15px;
+    margin-bottom: 2rem;
+    backdrop-filter: blur(10px);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+}
+
+.disclaimer-content p {
+    margin-bottom: 1rem;
+    line-height: 1.8;
+}
+
+/* Main app container */
+.app-container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 1rem;
+    background: rgba(255, 255, 255, 0.95);
+    min-height: 100vh;
+    backdrop-filter: blur(10px);
+}
+
+@media (min-width: 768px) {
+    .app-container {
+        margin: 2rem auto;
+        border-radius: 20px;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+        min-height: calc(100vh - 4rem);
+    }
+}
+
+/* Header */
+.app-header {
+    text-align: center;
+    padding: 2rem 0;
+    border-bottom: 2px solid #f0f0f0;
+    margin-bottom: 2rem;
+}
+
+.app-header h1 {
+    font-size: 1.8rem;
+    font-weight: bold;
+    color: #333;
+    margin-bottom: 0.5rem;
+}
+
+.app-header h2 {
+    font-size: 1.8rem;
+    font-weight: bold;
+    color: #667eea;
+}
+
+/* Timer section */
+.timer-section {
+    text-align: center;
+    padding: 1.5rem;
+    background: rgba(102, 126, 234, 0.1);
+    border-radius: 15px;
+    margin-bottom: 2rem;
+}
+
+.timer-label {
+    font-size: 1.1rem;
+    color: #666;
+    margin-bottom: 0.5rem;
+}
+
+.timer-value {
+    font-size: 2rem;
+    font-weight: bold;
+    font-family: 'Courier New', monospace;
+    color: #333;
+}
+
+/* Concentration display */
+.concentration-display {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+
+.concentration-card {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 1.5rem;
+    border-radius: 20px;
+    text-align: center;
+    box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+}
+
+.concentration-label {
+    font-size: 0.9rem;
+    opacity: 0.9;
+    margin-bottom: 0.5rem;
+}
+
+.concentration-value {
+    font-size: 1.8rem;
+    font-weight: bold;
+    font-family: 'Courier New', monospace;
+    margin-bottom: 0.5rem;
+}
+
+.concentration-unit {
+    font-size: 0.9rem;
+    opacity: 0.9;
+}
+
+/* Info sections */
+.info-section, .dosing-section, .control-section, .snapshots-section {
+    background: white;
+    border-radius: 15px;
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+.section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+.info-section h3, .dosing-section h3, .control-section h3, .snapshots-section h3 {
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: #333;
+    margin-bottom: 1rem;
+}
+
+/* Patient info grid */
+.patient-info-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+}
+
+.info-item {
+    display: flex;
+    flex-direction: column;
+}
+
+.info-label {
+    font-size: 0.85rem;
+    color: #666;
+    margin-bottom: 0.25rem;
+}
+
+.info-value {
+    font-weight: 600;
+    color: #333;
+}
+
+/* Dose controls */
+.dose-controls {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.dose-input-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.dose-input-group label {
+    font-weight: 600;
+    color: #333;
+}
+
+.slider-container {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.slider-container input[type="range"] {
+    flex: 1;
+    height: 6px;
+    background: #ddd;
+    border-radius: 3px;
+    outline: none;
+    -webkit-appearance: none;
+}
+
+.slider-container input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 20px;
+    height: 20px;
+    background: #667eea;
+    border-radius: 50%;
+    cursor: pointer;
+}
+
+.slider-value {
+    min-width: 50px;
+    text-align: center;
+    font-weight: 600;
+    color: #333;
+}
+
+/* Buttons */
+.primary-button, .secondary-button {
+    padding: 0.75rem 1.5rem;
+    border: none;
+    border-radius: 25px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-align: center;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+}
+
+.primary-button {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+}
+
+.primary-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+}
+
+.secondary-button {
+    background: white;
+    color: #667eea;
+    border: 2px solid #667eea;
+}
+
+.secondary-button:hover {
+    background: #667eea;
+    color: white;
+}
+
+.edit-button {
+    background: rgba(102, 126, 234, 0.1);
+    color: #667eea;
+    border: 1px solid #667eea;
+    padding: 0.4rem 0.8rem;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.edit-button:hover {
+    background: #667eea;
+    color: white;
+}
+
+/* Control buttons */
+.control-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.start-button {
+    background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
+    box-shadow: 0 4px 15px rgba(76, 175, 80, 0.3);
+}
+
+.stop-button {
+    background: linear-gradient(135deg, #f44336 0%, #da190b 100%);
+    box-shadow: 0 4px 15px rgba(244, 67, 54, 0.3);
+}
+
+.snapshot-button {
+    background: linear-gradient(135deg, #2196F3 0%, #0d7377 100%);
+    color: white !important;
+    box-shadow: 0 4px 15px rgba(33, 150, 243, 0.3);
+}
+
+/* Snapshots */
+.snapshots-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.snapshot-item {
+    background: #f8f9fa;
+    border-radius: 10px;
+    padding: 1rem;
+}
+
+.snapshot-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.5rem;
+}
+
+.snapshot-title {
+    font-weight: 600;
+    color: #333;
+}
+
+.snapshot-time {
+    font-size: 0.85rem;
+    color: #667eea;
+}
+
+.snapshot-values {
+    display: flex;
+    gap: 1rem;
+}
+
+.snapshot-values span {
+    font-size: 0.85rem;
+    color: #666;
+}
+
+/* Integration info */
+.integration-info {
+    background: rgba(102, 126, 234, 0.1);
+    border-radius: 10px;
+    padding: 1rem;
+    margin-bottom: 1.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.integration-method, .integration-stats {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.integration-stats {
+    display: flex;
+    gap: 1rem;
+}
+
+.integration-info .info-label {
+    font-size: 0.85rem;
+    color: #666;
+    font-weight: 600;
+}
+
+.integration-info .info-value {
+    font-size: 0.9rem;
+    color: #333;
+    font-weight: 700;
+    background: rgba(102, 126, 234, 0.2);
+    padding: 0.2rem 0.5rem;
+    border-radius: 4px;
+}
+
+/* Utility classes */
+.hidden {
+    display: none !important;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+    .app-container {
+        padding: 1rem;
+        margin: 0;
+        border-radius: 0;
+    }
+    
+    .concentration-display {
+        grid-template-columns: 1fr;
+    }
+    
+    .patient-info-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .dose-controls {
+        gap: 1rem;
+    }
+}

@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>リアルタイム Remimazolam PK/PD シミュレーター</title>
+    <link rel="stylesheet" href="styles/main.css">
+    <link rel="stylesheet" href="styles/components.css">
+</head>
+<body>
+    <!-- 免責事項画面 -->
+    <div id="disclaimer-screen" class="screen active">
+        <div class="disclaimer-container">
+            <div class="disclaimer-icon">⚠️</div>
+            <h1 class="disclaimer-title">免責事項</h1>
+            <div class="disclaimer-content">
+                <p>本アプリケーションは、薬物動態モデルに基づくシミュレーション結果を提供する教育・研究用ツールです。</p>
+                <p>表示される結果はあくまで理論値であり、実際の臨床的な患者の反応を保証するものではありません。</p>
+                <p>本アプリを実際の臨床判断の根拠として使用しないでください。</p>
+                <p>すべての臨床判断は、資格を持つ医療専門家の責任において行われるべきです。</p>
+            </div>
+            <button id="agree-button" class="primary-button">同意して使用開始</button>
+        </div>
+    </div>
+
+    <!-- メインシミュレーター画面 -->
+    <div id="main-screen" class="screen">
+        <div class="app-container">
+            <!-- ヘッダー -->
+            <header class="app-header">
+                <h1>リアルタイム Remimazolam</h1>
+                <h2>PK/PD シミュレーター</h2>
+            </header>
+
+            <!-- 経過時間表示 -->
+            <div id="timer-display" class="timer-section hidden">
+                <div class="timer-label">経過時間</div>
+                <div id="elapsed-time" class="timer-value">00:00:00</div>
+            </div>
+
+            <!-- 濃度表示 -->
+            <div class="concentration-display" id="concentration-display">
+                <div class="concentration-card plasma">
+                    <div class="concentration-label">血漿濃度</div>
+                    <div id="plasma-concentration" class="concentration-value">0.000</div>
+                    <div class="concentration-unit">µg/mL</div>
+                </div>
+                <div class="concentration-card effect-site">
+                    <div class="concentration-label">効果部位濃度</div>
+                    <div id="effect-concentration" class="concentration-value">0.000</div>
+                    <div class="concentration-unit">µg/mL</div>
+                </div>
+            </div>
+
+            <!-- 積分法表示（開発者用・通常は非表示） -->
+            <!--
+            <div id="integration-info" class="integration-info hidden">
+                <div class="integration-method">
+                    <span class="info-label">積分法:</span>
+                    <span id="integration-method" class="info-value">LSODA</span>
+                </div>
+                <div class="integration-stats">
+                    <span class="info-label">ステップ数:</span>
+                    <span id="integration-steps" class="info-value">0</span>
+                    <span class="info-label">関数評価:</span>
+                    <span id="integration-fev" class="info-value">0</span>
+                </div>
+            </div>
+            -->
+
+            <!-- 患者情報 -->
+            <section class="info-section">
+                <div class="section-header">
+                    <h3>STEP 1: 患者情報</h3>
+                    <button id="edit-patient-btn" class="edit-button">編集</button>
+                </div>
+                <div id="patient-info-display" class="patient-info-grid">
+                    <div class="info-item">
+                        <span class="info-label">年齢</span>
+                        <span id="patient-age" class="info-value">50歳</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">体重</span>
+                        <span id="patient-weight" class="info-value">70.0 kg</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">身長</span>
+                        <span id="patient-height" class="info-value">170 cm</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">BMI</span>
+                        <span id="patient-bmi" class="info-value">24.2</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">性別</span>
+                        <span id="patient-sex" class="info-value">男性</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">ASA-PS</span>
+                        <span id="patient-asa" class="info-value">ASA I-II</span>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 投与設定 -->
+            <section class="dosing-section">
+                <h3>STEP 2: 投与設定</h3>
+                <div class="dose-controls">
+                    <div class="dose-input-group">
+                        <label for="bolus-dose">初回ボーラス量 (mg)</label>
+                        <div class="slider-container">
+                            <input type="range" id="bolus-dose" min="0" max="50" step="0.5" value="12">
+                            <span id="bolus-value" class="slider-value">12.0</span>
+                        </div>
+                    </div>
+                    <div class="dose-input-group">
+                        <label for="continuous-dose">持続投与量 (mg/kg/hr)</label>
+                        <div class="slider-container">
+                            <input type="range" id="continuous-dose" min="0" max="5" step="0.1" value="1.0">
+                            <span id="continuous-value" class="slider-value">1.0</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- シミュレーション制御 -->
+            <section class="control-section">
+                <h3>STEP 3: シミュレーション制御</h3>
+                <div class="control-buttons">
+                    <button id="start-simulation" class="primary-button start-button">
+                        ▶ スタート
+                    </button>
+                    <button id="stop-simulation" class="primary-button stop-button hidden">
+                        ⏹ ストップ
+                    </button>
+                    <button id="take-snapshot" class="secondary-button snapshot-button hidden">
+                        📷 スナップショット
+                    </button>
+                </div>
+            </section>
+
+            <!-- スナップショット記録 -->
+            <section id="snapshots-section" class="snapshots-section hidden">
+                <h3 id="snapshots-title">記録 (0)</h3>
+                <div id="snapshots-list" class="snapshots-list"></div>
+            </section>
+        </div>
+    </div>
+
+    <!-- 患者情報編集モーダル -->
+    <div id="patient-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>患者情報編集</h3>
+                <button id="close-modal" class="close-button">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="modal-age">年齢 (歳)</label>
+                    <div class="slider-container">
+                        <input type="range" id="modal-age" min="18" max="100" step="1" value="50">
+                        <span id="modal-age-value" class="slider-value">50</span>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="modal-weight">体重 (kg)</label>
+                    <div class="slider-container">
+                        <input type="range" id="modal-weight" min="30" max="200" step="0.5" value="70">
+                        <span id="modal-weight-value" class="slider-value">70.0</span>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="modal-height">身長 (cm)</label>
+                    <div class="slider-container">
+                        <input type="range" id="modal-height" min="120" max="220" step="1" value="170">
+                        <span id="modal-height-value" class="slider-value">170</span>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>性別</label>
+                    <div class="radio-group">
+                        <label><input type="radio" name="sex" value="male" checked> 男性</label>
+                        <label><input type="radio" name="sex" value="female"> 女性</label>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>ASA-PS</label>
+                    <div class="radio-group">
+                        <label><input type="radio" name="asa" value="1-2" checked> ASA I-II</label>
+                        <label><input type="radio" name="asa" value="3-4"> ASA III-IV</label>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>BMI</label>
+                    <div id="modal-bmi-display" class="bmi-display">24.2</div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button id="cancel-modal" class="secondary-button">キャンセル</button>
+                <button id="save-modal" class="primary-button">保存</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="scripts/utils/desolve.js"></script>
+    <script src="scripts/utils/ke0-masui.js"></script>
+    <script src="scripts/masui-ke0-exact.js"></script>
+    <script src="scripts/enhanced-main.js"></script>
+</body>
+</html>

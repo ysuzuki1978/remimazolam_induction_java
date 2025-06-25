@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ke0計算方法比較</title>
+    <style>
+        body { 
+            font-family: Arial, sans-serif; 
+            padding: 2rem; 
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .result { 
+            background: #f8f9fa; 
+            padding: 1.5rem; 
+            margin: 1rem 0; 
+            border-radius: 8px; 
+            border-left: 4px solid #007bff;
+        }
+        .comparison {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+        .method {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .error { color: #dc3545; }
+        .warning { color: #ffc107; }
+        .success { color: #28a745; }
+        pre { 
+            background: #f1f3f4; 
+            padding: 1rem; 
+            border-radius: 4px; 
+            overflow-x: auto;
+            font-size: 0.9em;
+        }
+        .patient-input {
+            background: #e3f2fd;
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 2rem;
+        }
+        .input-group {
+            display: inline-block;
+            margin: 0.5rem 1rem 0.5rem 0;
+        }
+        label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 0.25rem;
+        }
+        input, select {
+            padding: 0.5rem;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            width: 100px;
+        }
+        button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-top: 1rem;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <h1>🧮 Ke0計算方法比較</h1>
+    
+    <div class="patient-input">
+        <h3>患者パラメータ</h3>
+        <div class="input-group">
+            <label for="age">年齢 (歳)</label>
+            <input type="number" id="age" value="50" min="18" max="100">
+        </div>
+        <div class="input-group">
+            <label for="weight">体重 (kg)</label>
+            <input type="number" id="weight" value="70" min="30" max="200" step="0.1">
+        </div>
+        <div class="input-group">
+            <label for="height">身長 (cm)</label>
+            <input type="number" id="height" value="170" min="120" max="220">
+        </div>
+        <div class="input-group">
+            <label for="sex">性別</label>
+            <select id="sex">
+                <option value="0">男性</option>
+                <option value="1">女性</option>
+            </select>
+        </div>
+        <div class="input-group">
+            <label for="asa">ASA-PS</label>
+            <select id="asa">
+                <option value="0">ASA I-II</option>
+                <option value="1">ASA III-IV</option>
+            </select>
+        </div>
+        <button onclick="calculateComparison()">計算実行</button>
+    </div>
+
+    <div id="results"></div>
+
+    <script src="scripts/utils/ke0-masui.js"></script>
+    <script>
+        function getCurrentPatient() {
+            return {
+                age: parseInt(document.getElementById('age').value),
+                weight: parseFloat(document.getElementById('weight').value),
+                height: parseFloat(document.getElementById('height').value),
+                sexValue: parseInt(document.getElementById('sex').value),
+                asaPSValue: parseInt(document.getElementById('asa').value),
+                get bmi() {
+                    return this.weight / Math.pow(this.height / 100, 2);
+                }
+            };
+        }
+
+        function calculateComparison() {
+            const patient = getCurrentPatient();
+            const results = document.getElementById('results');
+            
+            console.clear();
+            console.log('=== Ke0 Calculation Comparison ===');
+
+            results.innerHTML = `
+                <div class="result">
+                    <h3>患者情報</h3>
+                    <p><strong>年齢:</strong> ${patient.age}歳</p>
+                    <p><strong>体重:</strong> ${patient.weight}kg</p>
+                    <p><strong>身長:</strong> ${patient.height}cm</p>
+                    <p><strong>BMI:</strong> ${patient.bmi.toFixed(1)}</p>
+                    <p><strong>性別:</strong> ${patient.sexValue === 0 ? '男性' : '女性'}</p>
+                    <p><strong>ASA-PS:</strong> ${patient.asaPSValue === 0 ? 'ASA I-II' : 'ASA III-IV'}</p>
+                </div>
+            `;
+
+            // Method 1: Complete Masui Model
+            const masuiModel = new MasuiKe0Model();
+            const ke0_masui = masuiModel.calculateKe0(patient);
+            
+            // Method 2: Simplified Model
+            const simplifiedModel = new SimplifiedKe0Model();
+            const ke0_simplified = simplifiedModel.calculateKe0(patient);
+
+            // Method 3: Current App Model (from enhanced-main.js)
+            const ke0_current = calculateCurrentKe0(patient);
+
+            // Create comparison table
+            results.innerHTML += `
+                <div class="comparison">
+                    <div class="method">
+                        <h3>📚 完全なMasuiモデル</h3>
+                        <p><strong>ke0:</strong> ${ke0_masui.toFixed(6)} (1/min)</p>
+                        <p><strong>t1/2:</strong> ${(Math.log(2)/ke0_masui).toFixed(1)} 分</p>
+                        <p><strong>特徴:</strong> 全ての交互作用項を含む完全なモデル</p>
+                        <p class="${ke0_masui < 0.01 || ke0_masui > 2.0 ? 'error' : 'success'}">
+                            ${ke0_masui < 0.01 ? '値が小さすぎる' : ke0_masui > 2.0 ? '値が大きすぎる' : '妥当な範囲'}
+                        </p>
+                    </div>
+                    
+                    <div class="method">
+                        <h3>🎯 簡略化モデル</h3>
+                        <p><strong>ke0:</strong> ${ke0_simplified.toFixed(6)} (1/min)</p>
+                        <p><strong>t1/2:</strong> ${(Math.log(2)/ke0_simplified).toFixed(1)} 分</p>
+                        <p><strong>特徴:</strong> 臨床的に妥当な範囲に調整</p>
+                        <p class="success">臨床使用に適している</p>
+                    </div>
+                </div>
+                
+                <div class="result">
+                    <h3>🔄 現在のアプリモデル</h3>
+                    <p><strong>ke0:</strong> ${ke0_current.toFixed(6)} (1/min)</p>
+                    <p><strong>t1/2:</strong> ${(Math.log(2)/ke0_current).toFixed(1)} 分</p>
+                    <p><strong>使用中:</strong> enhanced-main.jsで実装されているモデル</p>
+                </div>
+
+                <div class="result">
+                    <h3>📊 比較結果</h3>
+                    <p><strong>完全Masui vs 簡略化:</strong> ${Math.abs(ke0_masui - ke0_simplified).toFixed(6)} 差</p>
+                    <p><strong>完全Masui vs 現在:</strong> ${Math.abs(ke0_masui - ke0_current).toFixed(6)} 差</p>
+                    <p><strong>簡略化 vs 現在:</strong> ${Math.abs(ke0_simplified - ke0_current).toFixed(6)} 差</p>
+                </div>
+
+                <div class="result">
+                    <h3>💡 推奨事項</h3>
+                    <p>Remimazolamの典型的なke0値: <strong>0.2-0.4 (1/min)</strong></p>
+                    <p>対応する平衡時間: <strong>2-4分</strong></p>
+                    <p>推奨モデル: <strong>${
+                        Math.abs(ke0_simplified - 0.3) < Math.abs(ke0_masui - 0.3) ? '簡略化モデル' : '完全Masuiモデル'
+                    }</strong></p>
+                </div>
+            `;
+        }
+
+        // Current app model for comparison
+        function calculateCurrentKe0(patient) {
+            const baseKe0 = 0.3;
+            const ageRatio = patient.age / 54.0;
+            const ageFactor = Math.pow(ageRatio, -0.15);
+            const weightRatio = patient.weight / 67.3;
+            const weightFactor = Math.pow(weightRatio, -0.1);
+            const sexFactor = patient.sexValue === 0 ? 1.0 : 0.9;
+            const asaFactor = patient.asaPSValue === 0 ? 1.0 : 0.85;
+            const ke0 = baseKe0 * ageFactor * weightFactor * sexFactor * asaFactor;
+            return Math.max(0.1, Math.min(0.8, ke0));
+        }
+
+        // Initial calculation
+        calculateComparison();
+    </script>
+</body>
+</html>

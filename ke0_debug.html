@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ke0計算デバッグ</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 2rem; }
+        .result { background: #f0f0f0; padding: 1rem; margin: 1rem 0; border-radius: 5px; }
+        .error { color: red; }
+        .ok { color: green; }
+    </style>
+</head>
+<body>
+    <h1>Ke0計算デバッグ</h1>
+    
+    <div id="results"></div>
+
+    <script>
+        // 現在のKe0定数
+        const Ke0Constants = {
+            baseLogKe0: -9.06,
+            ageAmplitude: 5.44,
+            ageMean: 30.0,
+            ageStandardDeviation: 15.0,
+            weightAmplitude: 2.1,
+            weightMean: 70.0,
+            weightStandardDeviation: 20.0,
+            heightAmplitude: 1.8,
+            heightMean: 165.0,
+            heightStandardDeviation: 15.0,
+            bmiAmplitude: 1.2,
+            bmiMean: 22.0,
+            bmiStandardDeviation: 5.0,
+            genderEffect: 0.15,
+            asaEffect: 0.08,
+            timeConversionFactor: 60.0
+        };
+
+        // 現在の計算方法
+        function calculateKe0Current(patient) {
+            const age = patient.age;
+            const weight = patient.weight;
+            const height = patient.height;
+            const bmi = patient.bmi;
+            const sex = patient.sexValue;
+            const asaPS = patient.asaPSValue;
+
+            const ageEffect = Ke0Constants.ageAmplitude * Math.exp(
+                -Math.pow((age - Ke0Constants.ageMean) / Ke0Constants.ageStandardDeviation, 2) / 2
+            );
+            const weightEffect = Ke0Constants.weightAmplitude * Math.exp(
+                -Math.pow((weight - Ke0Constants.weightMean) / Ke0Constants.weightStandardDeviation, 2) / 2
+            );
+            const heightEffect = Ke0Constants.heightAmplitude * Math.exp(
+                -Math.pow((height - Ke0Constants.heightMean) / Ke0Constants.heightStandardDeviation, 2) / 2
+            );
+            const bmiEffect = Ke0Constants.bmiAmplitude * Math.exp(
+                -Math.pow((bmi - Ke0Constants.bmiMean) / Ke0Constants.bmiStandardDeviation, 2) / 2
+            );
+
+            const logKe0 = Ke0Constants.baseLogKe0 + ageEffect + weightEffect + heightEffect + bmiEffect +
+                          Ke0Constants.genderEffect * sex + Ke0Constants.asaEffect * asaPS;
+
+            return Math.exp(logKe0) / Ke0Constants.timeConversionFactor;
+        }
+
+        // 修正版（典型的なMasui ke0モデル）
+        function calculateKe0Corrected(patient) {
+            // Masui ke0 model: より典型的な値を使用
+            const baseKe0 = 0.3; // 基本ke0値 (1/min)
+            
+            // 年齢補正 (若い方が速い)
+            const ageRatio = patient.age / 54.0;
+            const ageFactor = Math.pow(ageRatio, -0.2);
+            
+            // 性別補正 (男性1.0, 女性0.85)
+            const sexFactor = patient.sexValue === 0 ? 1.0 : 0.85;
+            
+            // ASA補正 (ASA I-II: 1.0, ASA III-IV: 0.8)
+            const asaFactor = patient.asaPSValue === 0 ? 1.0 : 0.8;
+            
+            return baseKe0 * ageFactor * sexFactor * asaFactor;
+        }
+
+        // テスト患者
+        const testPatient = {
+            age: 50,
+            weight: 70,
+            height: 170,
+            bmi: 70 / Math.pow(170/100, 2),
+            sexValue: 0, // 男性
+            asaPSValue: 0 // ASA I-II
+        };
+
+        const results = document.getElementById('results');
+        
+        // 現在の計算
+        const ke0Current = calculateKe0Current(testPatient);
+        results.innerHTML += `<div class="result">
+            <h3>現在のKe0計算</h3>
+            <p>Ke0 = ${ke0Current.toFixed(6)} (1/min)</p>
+            <p>平衡時間（t1/2）= ${(Math.log(2)/ke0Current).toFixed(1)} 分</p>
+            <p class="${ke0Current < 0.001 || ke0Current > 10 ? 'error' : 'ok'}">
+                ${ke0Current < 0.001 ? '値が小さすぎる' : ke0Current > 10 ? '値が大きすぎる' : '妥当な範囲'}
+            </p>
+        </div>`;
+
+        // 修正版計算
+        const ke0Corrected = calculateKe0Corrected(testPatient);
+        results.innerHTML += `<div class="result">
+            <h3>修正版Ke0計算</h3>
+            <p>Ke0 = ${ke0Corrected.toFixed(6)} (1/min)</p>
+            <p>平衡時間（t1/2）= ${(Math.log(2)/ke0Corrected).toFixed(1)} 分</p>
+            <p class="ok">リアルな値</p>
+        </div>`;
+
+        // 理論値
+        results.innerHTML += `<div class="result">
+            <h3>Remimazolamの典型的Ke0値</h3>
+            <p>文献値: 0.2-0.4 (1/min)</p>
+            <p>平衡時間: 2-4分</p>
+            <p>迅速な効果発現が特徴</p>
+        </div>`;
+
+        // デバッグ情報
+        const ageEffect = Ke0Constants.ageAmplitude * Math.exp(
+            -Math.pow((testPatient.age - Ke0Constants.ageMean) / Ke0Constants.ageStandardDeviation, 2) / 2
+        );
+        const weightEffect = Ke0Constants.weightAmplitude * Math.exp(
+            -Math.pow((testPatient.weight - Ke0Constants.weightMean) / Ke0Constants.weightStandardDeviation, 2) / 2
+        );
+        
+        results.innerHTML += `<div class="result">
+            <h3>計算詳細（現在版）</h3>
+            <p>baseLogKe0: ${Ke0Constants.baseLogKe0}</p>
+            <p>ageEffect: ${ageEffect.toFixed(3)}</p>
+            <p>weightEffect: ${weightEffect.toFixed(3)}</p>
+            <p>logKe0合計: ${(Ke0Constants.baseLogKe0 + ageEffect + weightEffect).toFixed(3)}</p>
+            <p>exp(logKe0): ${Math.exp(Ke0Constants.baseLogKe0 + ageEffect + weightEffect).toFixed(6)}</p>
+            <p>÷60後: ${(Math.exp(Ke0Constants.baseLogKe0 + ageEffect + weightEffect) / 60).toFixed(6)}</p>
+        </div>`;
+    </script>
+</body>
+</html>

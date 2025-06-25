@@ -1,0 +1,301 @@
+/* Modal styles */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(5px);
+}
+
+.modal.active {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.modal-content {
+    background: white !important;
+    color: #333 !important;
+    border-radius: 20px;
+    width: 90%;
+    max-width: 500px;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    animation: modalSlideIn 0.3s ease-out;
+}
+
+@keyframes modalSlideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-50px) scale(0.9);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.5rem;
+    border-bottom: 1px solid #eee;
+}
+
+.modal-header h3 {
+    font-size: 1.3rem;
+    font-weight: bold;
+    color: #333;
+}
+
+.close-button {
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    color: #999;
+    cursor: pointer;
+    padding: 0;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    transition: all 0.3s ease;
+}
+
+.close-button:hover {
+    background: #f0f0f0;
+    color: #333;
+}
+
+.modal-body {
+    padding: 1.5rem;
+}
+
+.modal-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 1rem;
+    padding: 1.5rem;
+    border-top: 1px solid #eee;
+}
+
+/* Form styles */
+.form-group {
+    margin-bottom: 1.5rem;
+}
+
+.form-group label {
+    display: block;
+    font-weight: 600;
+    color: #333 !important;
+    margin-bottom: 0.5rem;
+}
+
+.modal .form-group label {
+    color: #333 !important;
+}
+
+.modal .form-group * {
+    color: #333 !important;
+}
+
+.radio-group {
+    display: flex;
+    gap: 1rem;
+    margin-top: 0.5rem;
+}
+
+.radio-group label {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-weight: normal;
+    cursor: pointer;
+    color: #333 !important;
+}
+
+.radio-group input[type="radio"] {
+    margin: 0;
+    cursor: pointer;
+}
+
+.bmi-display {
+    background: #f8f9fa;
+    padding: 0.75rem;
+    border-radius: 8px;
+    font-weight: 600;
+    color: #333;
+    text-align: center;
+    border: 2px solid #e9ecef;
+}
+
+/* Enhanced slider styles for modal */
+.modal .slider-container input[type="range"] {
+    background: #e9ecef;
+}
+
+.modal .slider-container input[type="range"]::-webkit-slider-thumb {
+    background: #667eea;
+}
+
+.modal .slider-container input[type="range"]::-moz-range-thumb {
+    background: #667eea;
+    border: none;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    cursor: pointer;
+}
+
+/* Loading animations */
+.loading-spinner {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    border: 2px solid #f3f3f3;
+    border-top: 2px solid #667eea;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Status indicators */
+.status-indicator {
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    margin-right: 0.5rem;
+}
+
+.status-indicator.running {
+    background: #4CAF50;
+    animation: pulse 1.5s ease-in-out infinite alternate;
+}
+
+.status-indicator.stopped {
+    background: #f44336;
+}
+
+@keyframes pulse {
+    from {
+        opacity: 1;
+    }
+    to {
+        opacity: 0.5;
+    }
+}
+
+/* Enhanced concentration cards */
+.concentration-card.plasma {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.concentration-card.effect-site {
+    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+}
+
+/* Force light mode for modal - ダークモード対応を無効化 */
+.modal-content {
+    background: white !important;
+    color: #333 !important;
+}
+
+.modal-header {
+    border-bottom-color: #eee !important;
+}
+
+.modal-footer {
+    border-top-color: #eee !important;
+}
+
+.modal .form-group label {
+    color: #333 !important;
+}
+
+.modal .bmi-display {
+    background: #f8f9fa !important;
+    color: #333 !important;
+    border-color: #e9ecef !important;
+}
+
+.modal .close-button {
+    color: #999 !important;
+}
+
+.modal .close-button:hover {
+    background: #f0f0f0 !important;
+    color: #333 !important;
+}
+
+/* Ensure all modal text is dark */
+.modal * {
+    color: #333 !important;
+}
+
+.modal input, .modal select, .modal textarea {
+    color: #333 !important;
+    background: white !important;
+}
+
+/* Dark mode support - 無効化 */
+/*
+@media (prefers-color-scheme: dark) {
+    .modal-content {
+        background: #2d3748;
+        color: white;
+    }
+}
+*/
+
+/* Accessibility improvements */
+.visually-hidden {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+}
+
+/* Focus states */
+button:focus,
+input:focus {
+    outline: 2px solid #667eea;
+    outline-offset: 2px;
+}
+
+/* Print styles */
+@media print {
+    .modal {
+        display: none !important;
+    }
+    
+    .control-buttons {
+        display: none !important;
+    }
+    
+    body {
+        background: white !important;
+    }
+    
+    .app-container {
+        box-shadow: none !important;
+        border: 1px solid #ddd;
+    }
+}

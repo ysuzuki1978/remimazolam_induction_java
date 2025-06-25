@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>テスト - ボタン動作確認</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 2rem;
+            background: #f0f0f0;
+        }
+        .test-container {
+            max-width: 500px;
+            margin: 0 auto;
+            background: white;
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        button {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 1rem 2rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            margin: 0.5rem;
+        }
+        button:hover {
+            background: #5a6fd8;
+        }
+        .status {
+            margin-top: 1rem;
+            padding: 1rem;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1>ボタン動作テスト</h1>
+        
+        <div id="test-screen-1">
+            <h2>画面1: 免責事項</h2>
+            <p>これはテスト用の免責事項です。</p>
+            <button id="test-agree-button">同意して次へ</button>
+        </div>
+        
+        <div id="test-screen-2" class="hidden">
+            <h2>画面2: メイン画面</h2>
+            <p>画面切り替えが成功しました！</p>
+            <button id="test-back-button">戻る</button>
+        </div>
+        
+        <div class="status" id="status">
+            <strong>ステータス:</strong> <span id="status-text">待機中</span>
+        </div>
+    </div>
+
+    <script>
+        console.log('Test script loaded');
+        
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log('DOM loaded for test');
+            
+            const agreeButton = document.getElementById('test-agree-button');
+            const backButton = document.getElementById('test-back-button');
+            const screen1 = document.getElementById('test-screen-1');
+            const screen2 = document.getElementById('test-screen-2');
+            const statusText = document.getElementById('status-text');
+            
+            function updateStatus(text) {
+                statusText.textContent = text;
+                console.log('Status:', text);
+            }
+            
+            updateStatus('初期化完了');
+            
+            if (agreeButton) {
+                agreeButton.addEventListener('click', () => {
+                    console.log('Agree button clicked');
+                    updateStatus('同意ボタンがクリックされました');
+                    
+                    screen1.classList.add('hidden');
+                    screen2.classList.remove('hidden');
+                    updateStatus('画面2に切り替えました');
+                });
+            }
+            
+            if (backButton) {
+                backButton.addEventListener('click', () => {
+                    console.log('Back button clicked');
+                    updateStatus('戻るボタンがクリックされました');
+                    
+                    screen2.classList.add('hidden');
+                    screen1.classList.remove('hidden');
+                    updateStatus('画面1に戻りました');
+                });
+            }
+        });
+    </script>
+</body>
+</html>

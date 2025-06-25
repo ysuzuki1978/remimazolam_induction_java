@@ -1,0 +1,32 @@
+{
+  "name": "remimazolam-pk-pd-simulator",
+  "version": "1.0.0",
+  "description": "リアルタイム Remimazolam PK/PD シミュレーター - Masui 2022モデルに基づく薬物動態計算",
+  "main": "index.html",
+  "scripts": {
+    "dev": "python -m http.server 8000",
+    "build": "echo 'No build step required for vanilla JS'",
+    "deploy": "echo 'Ready for GitHub Pages deployment'"
+  },
+  "keywords": [
+    "remimazolam",
+    "pharmacokinetics",
+    "pharmacodynamics",
+    "masui-model",
+    "anesthesia",
+    "simulation",
+    "medical-education"
+  ],
+  "author": "YASUYUKI SUZUKI",
+  "license": "MIT",
+  "homepage": "https://github.com/your-username/remimazolam-pk-pd-simulator",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/your-username/remimazolam-pk-pd-simulator.git"
+  },
+  "devDependencies": {},
+  "dependencies": {},
+  "engines": {
+    "node": ">=14.0.0"
+  }
+}

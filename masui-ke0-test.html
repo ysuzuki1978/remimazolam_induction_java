@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Masui Ke0 正確な計算テスト</title>
+    <style>
+        body { 
+            font-family: Arial, sans-serif; 
+            padding: 2rem; 
+            max-width: 1400px;
+            margin: 0 auto;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            margin-bottom: 2rem;
+        }
+        .input-section {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 2rem;
+            border-radius: 10px;
+            margin-bottom: 2rem;
+        }
+        .input-group {
+            display: inline-block;
+            margin: 0.5rem 1rem 0.5rem 0;
+        }
+        label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+            color: white;
+        }
+        input, select {
+            padding: 0.75rem;
+            border: none;
+            border-radius: 5px;
+            width: 120px;
+            font-size: 1rem;
+        }
+        button {
+            background: #28a745;
+            color: white;
+            border: none;
+            padding: 1rem 2rem;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1.1rem;
+            margin-top: 1rem;
+            transition: background 0.3s;
+        }
+        button:hover {
+            background: #218838;
+        }
+        .result-section {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+        .method-result {
+            background: #f8f9fa;
+            padding: 1.5rem;
+            border-radius: 8px;
+            border-left: 4px solid #007bff;
+        }
+        .method-result h3 {
+            margin-top: 0;
+            color: #007bff;
+        }
+        .success { color: #28a745; font-weight: bold; }
+        .error { color: #dc3545; font-weight: bold; }
+        .warning { color: #ffc107; font-weight: bold; }
+        .value { 
+            font-size: 1.2rem; 
+            font-weight: bold; 
+            background: #e3f2fd;
+            padding: 0.5rem;
+            border-radius: 4px;
+            margin: 0.5rem 0;
+        }
+        .detailed-results {
+            background: #fff;
+            padding: 2rem;
+            border-radius: 8px;
+            margin-top: 2rem;
+        }
+        .step-result {
+            margin-bottom: 1.5rem;
+            padding: 1rem;
+            background: #f1f3f4;
+            border-radius: 5px;
+        }
+        .step-title {
+            font-weight: bold;
+            color: #495057;
+            margin-bottom: 0.5rem;
+        }
+        pre {
+            background: #212529;
+            color: #ffffff;
+            padding: 1rem;
+            border-radius: 5px;
+            overflow-x: auto;
+            font-size: 0.9rem;
+        }
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+        }
+        .comparison-table th,
+        .comparison-table td {
+            padding: 0.75rem;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        .comparison-table th {
+            background-color: #007bff;
+            color: white;
+        }
+        .comparison-table tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+    </style>
+</head>
+<body>
+    <h1>🧮 Masui Ke0 正確な計算テスト</h1>
+    <p>指示通りの数値解析（厳密解）と重回帰モデル（近似解）を実装したテストページです。</p>
+    
+    <div class="input-section">
+        <h3>患者パラメータ</h3>
+        <div class="input-group">
+            <label for="age">年齢 (歳)</label>
+            <input type="number" id="age" value="55" min="18" max="100">
+        </div>
+        <div class="input-group">
+            <label for="tbw">総体重 (kg)</label>
+            <input type="number" id="tbw" value="70" min="30" max="200" step="0.1">
+        </div>
+        <div class="input-group">
+            <label for="height">身長 (cm)</label>
+            <input type="number" id="height" value="170" min="120" max="220">
+        </div>
+        <div class="input-group">
+            <label for="sex">性別</label>
+            <select id="sex">
+                <option value="0">男性 (0)</option>
+                <option value="1">女性 (1)</option>
+            </select>
+        </div>
+        <div class="input-group">
+            <label for="asaps">ASA-PS</label>
+            <select id="asaps">
+                <option value="0">ASA I-II (0)</option>
+                <option value="1">ASA III-IV (1)</option>
+            </select>
+        </div>
+        <button onclick="performCalculation()">正確な計算を実行</button>
+    </div>
+
+    <div id="results"></div>
+
+    <script src="scripts/masui-ke0-exact.js"></script>
+    <script>
+        function getCurrentPatient() {
+            return {
+                age: parseInt(document.getElementById('age').value),
+                TBW: parseFloat(document.getElementById('tbw').value),
+                height: parseFloat(document.getElementById('height').value),
+                sex: parseInt(document.getElementById('sex').value),
+                ASAPS: parseInt(document.getElementById('asaps').value)
+            };
+        }
+
+        function performCalculation() {
+            const patient = getCurrentPatient();
+            const resultsDiv = document.getElementById('results');
+            
+            console.clear();
+            console.log('=== Masui Ke0 Exact Calculation Test ===');
+            console.log('Patient parameters:', patient);
+
+            // 正確なMasui計算を実行
+            const result = MasuiKe0Calculator.calculateKe0Complete(
+                patient.age, patient.TBW, patient.height, patient.sex, patient.ASAPS
+            );
+
+            // 患者情報表示
+            let html = `
+                <div class="container">
+                    <h3>📋 患者情報</h3>
+                    <table class="comparison-table">
+                        <tr><th>項目</th><th>値</th></tr>
+                        <tr><td>年齢</td><td>${patient.age}歳</td></tr>
+                        <tr><td>総体重 (TBW)</td><td>${patient.TBW}kg</td></tr>
+                        <tr><td>身長</td><td>${patient.height}cm</td></tr>
+                        <tr><td>性別</td><td>${patient.sex === 0 ? '男性' : '女性'} (${patient.sex})</td></tr>
+                        <tr><td>ASA-PS</td><td>${patient.ASAPS === 0 ? 'ASA I-II' : 'ASA III-IV'} (${patient.ASAPS})</td></tr>
+                        <tr><td>BMI</td><td>${(patient.TBW / Math.pow(patient.height / 100, 2)).toFixed(1)}</td></tr>
+                    </table>
+                </div>
+            `;
+
+            if (result.success) {
+                // 主要結果
+                html += `
+                    <div class="result-section">
+                        <div class="method-result">
+                            <h3>🔬 数値解析（厳密解）</h3>
+                            <div class="value">ke0 = ${result.ke0_numerical ? result.ke0_numerical.toFixed(5) : 'Failed'} (1/min)</div>
+                            <p><strong>t1/2:</strong> ${result.ke0_numerical ? (Math.log(2)/result.ke0_numerical).toFixed(2) : 'N/A'} 分</p>
+                            <p><strong>方法:</strong> 3次方程式解 → 係数計算 → 数値的根探索</p>
+                            <p class="${result.ke0_numerical ? 'success' : 'error'}">
+                                ${result.ke0_numerical ? '計算成功' : '計算失敗'}
+                            </p>
+                        </div>
+                        
+                        <div class="method-result">
+                            <h3>📊 重回帰モデル（近似解）</h3>
+                            <div class="value">ke0 = ${result.ke0_regression.toFixed(5)} (1/min)</div>
+                            <p><strong>t1/2:</strong> ${(Math.log(2)/result.ke0_regression).toFixed(2)} 分</p>
+                            <p><strong>方法:</strong> 多変量重回帰式</p>
+                            <p class="success">計算成功</p>
+                        </div>
+                    </div>
+                `;
+
+                // 詳細結果
+                html += `
+                    <div class="detailed-results">
+                        <h3>📝 詳細計算結果</h3>
+                        
+                        <div class="step-result">
+                            <div class="step-title">ステップ1: PKパラメータ</div>
+                            <table class="comparison-table">
+                                <tr><th>パラメータ</th><th>値</th><th>単位</th></tr>
+                                <tr><td>理想体重 (IBW)</td><td>${result.pkParameters.IBW.toFixed(2)}</td><td>kg</td></tr>
+                                <tr><td>調整体重 (ABW)</td><td>${result.pkParameters.ABW.toFixed(2)}</td><td>kg</td></tr>
+                                <tr><td>V1</td><td>${result.pkParameters.V1.toFixed(2)}</td><td>L</td></tr>
+                                <tr><td>V2</td><td>${result.pkParameters.V2.toFixed(2)}</td><td>L</td></tr>
+                                <tr><td>V3</td><td>${result.pkParameters.V3.toFixed(2)}</td><td>L</td></tr>
+                                <tr><td>CL</td><td>${result.pkParameters.CL.toFixed(3)}</td><td>L/min</td></tr>
+                                <tr><td>Q2</td><td>${result.pkParameters.Q2.toFixed(3)}</td><td>L/min</td></tr>
+                                <tr><td>Q3</td><td>${result.pkParameters.Q3.toFixed(3)}</td><td>L/min</td></tr>
+                            </table>
+                        </div>
+
+                        <div class="step-result">
+                            <div class="step-title">ステップ2: 速度定数</div>
+                            <table class="comparison-table">
+                                <tr><th>定数</th><th>値</th><th>単位</th></tr>
+                                <tr><td>k10</td><td>${result.rateConstants.k10.toFixed(4)}</td><td>1/min</td></tr>
+                                <tr><td>k12</td><td>${result.rateConstants.k12.toFixed(4)}</td><td>1/min</td></tr>
+                                <tr><td>k13</td><td>${result.rateConstants.k13.toFixed(4)}</td><td>1/min</td></tr>
+                                <tr><td>k21</td><td>${result.rateConstants.k21.toFixed(4)}</td><td>1/min</td></tr>
+                                <tr><td>k31</td><td>${result.rateConstants.k31.toFixed(4)}</td><td>1/min</td></tr>
+                            </table>
+                        </div>
+
+                        <div class="step-result">
+                            <div class="step-title">ステップ3: 血漿濃度係数</div>
+                            <table class="comparison-table">
+                                <tr><th>係数</th><th>値</th></tr>
+                                <tr><td>α (alpha)</td><td>${result.plasmaCoefficients.alpha.toFixed(6)}</td></tr>
+                                <tr><td>β (beta)</td><td>${result.plasmaCoefficients.beta.toFixed(6)}</td></tr>
+                                <tr><td>γ (gamma)</td><td>${result.plasmaCoefficients.gamma.toFixed(6)}</td></tr>
+                                <tr><td>A</td><td>${result.plasmaCoefficients.A.toFixed(6)}</td></tr>
+                                <tr><td>B</td><td>${result.plasmaCoefficients.B.toFixed(6)}</td></tr>
+                                <tr><td>C</td><td>${result.plasmaCoefficients.C.toFixed(6)}</td></tr>
+                            </table>
+                        </div>
+
+                        <div class="step-result">
+                            <div class="step-title">比較分析</div>
+                            <table class="comparison-table">
+                                <tr><th>項目</th><th>数値解析</th><th>重回帰</th><th>差</th></tr>
+                                <tr>
+                                    <td>ke0 (1/min)</td>
+                                    <td>${result.ke0_numerical ? result.ke0_numerical.toFixed(5) : 'N/A'}</td>
+                                    <td>${result.ke0_regression.toFixed(5)}</td>
+                                    <td>${result.ke0_numerical ? Math.abs(result.ke0_numerical - result.ke0_regression).toFixed(5) : 'N/A'}</td>
+                                </tr>
+                                <tr>
+                                    <td>半減期 (分)</td>
+                                    <td>${result.ke0_numerical ? (Math.log(2)/result.ke0_numerical).toFixed(2) : 'N/A'}</td>
+                                    <td>${(Math.log(2)/result.ke0_regression).toFixed(2)}</td>
+                                    <td>${result.ke0_numerical ? Math.abs(Math.log(2)/result.ke0_numerical - Math.log(2)/result.ke0_regression).toFixed(2) : 'N/A'}</td>
+                                </tr>
+                            </table>
+                        </div>
+
+                        <div class="step-result">
+                            <div class="step-title">妥当性評価</div>
+                            <p><strong>Remimazolamの典型的なke0値:</strong> 0.2-0.4 (1/min)</p>
+                            <p><strong>対応する平衡時間:</strong> 2-4分</p>
+                            <p><strong>数値解析結果:</strong> 
+                                <span class="${result.ke0_numerical && result.ke0_numerical >= 0.2 && result.ke0_numerical <= 0.4 ? 'success' : 'warning'}">
+                                    ${result.ke0_numerical ? (result.ke0_numerical >= 0.2 && result.ke0_numerical <= 0.4 ? '妥当な範囲' : '範囲外') : '計算失敗'}
+                                </span>
+                            </p>
+                            <p><strong>重回帰結果:</strong> 
+                                <span class="${result.ke0_regression >= 0.2 && result.ke0_regression <= 0.4 ? 'success' : 'warning'}">
+                                    ${result.ke0_regression >= 0.2 && result.ke0_regression <= 0.4 ? '妥当な範囲' : '範囲外'}
+                                </span>
+                            </p>
+                        </div>
+                    </div>
+                `;
+
+            } else {
+                html += `
+                    <div class="container">
+                        <h3 class="error">❌ 計算エラー</h3>
+                        <p>計算中にエラーが発生しました: ${result.error}</p>
+                    </div>
+                `;
+            }
+
+            resultsDiv.innerHTML = html;
+        }
+
+        // 初期計算実行
+        performCalculation();
+    </script>
+</body>
+</html>

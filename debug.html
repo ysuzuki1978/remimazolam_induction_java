@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>デバッグ版 - Remimazolam Simulator</title>
+    <link rel="stylesheet" href="styles/main.css">
+    <link rel="stylesheet" href="styles/components.css">
+</head>
+<body>
+    <!-- 免責事項画面 -->
+    <div id="disclaimer-screen" class="screen active">
+        <div class="disclaimer-container">
+            <div class="disclaimer-icon">⚠️</div>
+            <h1 class="disclaimer-title">免責事項</h1>
+            <div class="disclaimer-content">
+                <p>本アプリケーションは、薬物動態モデルに基づくシミュレーション結果を提供する教育・研究用ツールです。</p>
+                <p>表示される結果はあくまで理論値であり、実際の臨床的な患者の反応を保証するものではありません。</p>
+                <p>本アプリを実際の臨床判断の根拠として使用しないでください。</p>
+                <p>すべての臨床判断は、資格を持つ医療専門家の責任において行われるべきです。</p>
+            </div>
+            <button id="agree-button" class="primary-button">同意して使用開始</button>
+        </div>
+    </div>
+
+    <!-- メインシミュレーター画面 -->
+    <div id="main-screen" class="screen">
+        <div class="app-container">
+            <header class="app-header">
+                <h1>リアルタイム Remimazolam</h1>
+                <h2>PK/PD シミュレーター</h2>
+            </header>
+            
+            <div class="info-section">
+                <h3>デバッグ情報</h3>
+                <div id="debug-info">
+                    <p>アプリケーションが正常に初期化されました。</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // デバッグ版：最小限の機能のみ
+        console.log('Debug script starting...');
+        
+        // 単純な初期化
+        function initializeDebugApp() {
+            console.log('Initializing debug app...');
+            
+            const agreeButton = document.getElementById('agree-button');
+            const disclaimerScreen = document.getElementById('disclaimer-screen');
+            const mainScreen = document.getElementById('main-screen');
+            const debugInfo = document.getElementById('debug-info');
+            
+            console.log('Elements found:', {
+                agreeButton: !!agreeButton,
+                disclaimerScreen: !!disclaimerScreen,
+                mainScreen: !!mainScreen,
+                debugInfo: !!debugInfo
+            });
+            
+            if (agreeButton) {
+                agreeButton.addEventListener('click', function() {
+                    console.log('Agree button clicked - starting transition');
+                    
+                    if (disclaimerScreen && mainScreen) {
+                        disclaimerScreen.style.display = 'none';
+                        mainScreen.style.display = 'flex';
+                        mainScreen.style.flexDirection = 'column';
+                        
+                        if (debugInfo) {
+                            debugInfo.innerHTML = `
+                                <p>✅ 画面切り替え成功！</p>
+                                <p>時刻: ${new Date().toLocaleTimeString()}</p>
+                                <p>ボタンクリック処理が正常に動作しています。</p>
+                            `;
+                        }
+                        
+                        console.log('Screen transition completed successfully');
+                    } else {
+                        console.error('Screen elements not found for transition');
+                    }
+                });
+                
+                console.log('Event listener attached successfully');
+            } else {
+                console.error('Agree button not found!');
+            }
+        }
+        
+        // DOM ready check
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initializeDebugApp);
+        } else {
+            initializeDebugApp();
+        }
+        
+        console.log('Debug script loaded');
+    </script>
+</body>
+</html>
